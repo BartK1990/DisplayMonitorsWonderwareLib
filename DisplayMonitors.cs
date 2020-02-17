@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Microsoft.Win32.SafeHandles;
 
 namespace DisplayMonitorsWonderwareLib
 {
@@ -67,6 +67,39 @@ namespace DisplayMonitorsWonderwareLib
                 {
                     cordsArray[i * 2] = monitorXcordsList[i];
                     cordsArray[i * 2 + 1] = monitorYcordsList[i];
+                }
+            }
+            return cordsArray;
+        }
+
+        public int[] MonitorsCoordinates0Based()
+        { 
+            int[] cordsArray = MonitorsCoordinates();
+            if (cordsArray.Length <= 0) return cordsArray;
+
+            int xMin = 0, yMin = 0;
+            for (int i = 0; i < cordsArray.Length; i++)
+            {
+                if (i % 2 == 0)
+                {
+                    if (cordsArray[i] < xMin)
+                        xMin = cordsArray[i];
+                }
+                else
+                {
+                    if (cordsArray[i] < yMin)
+                        yMin = cordsArray[i];
+                }
+            }
+            for (int i = 0; i < cordsArray.Length; i++)
+            {
+                if (i % 2 == 0)
+                {
+                    cordsArray[i] = 0 - xMin;
+                }
+                else
+                {
+                    cordsArray[i] = 0 - yMin;
                 }
             }
             return cordsArray;
