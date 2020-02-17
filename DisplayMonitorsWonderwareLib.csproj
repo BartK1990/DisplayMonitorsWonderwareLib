@@ -1,7 +1,13 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="DisplayMonitorsWonderwareLib.Tests\**" />
+    <EmbeddedResource Remove="DisplayMonitorsWonderwareLib.Tests\**" />
+    <None Remove="DisplayMonitorsWonderwareLib.Tests\**" />
+  </ItemGroup>
 
 </Project>
