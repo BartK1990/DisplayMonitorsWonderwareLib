@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "DisplayMonitorsWonderwareLib": {
+      "commandName": "Executable",
+      "executablePath": "C:\\Users\\kuriatab\\source\\repos\\CheckDisplayMonitors\\bin\\Debug\\CheckDisplayMonitors.exe"
+    }
+  }
+}

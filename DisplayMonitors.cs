@@ -82,24 +82,22 @@ namespace DisplayMonitorsWonderwareLib
             {
                 if (i % 2 == 0)
                 {
-                    if (cordsArray[i] < xMin)
-                        xMin = cordsArray[i];
+                    xMin = (cordsArray[i] < xMin) ? cordsArray[i] : xMin;
                 }
                 else
                 {
-                    if (cordsArray[i] < yMin)
-                        yMin = cordsArray[i];
+                    yMin = (cordsArray[i] < yMin) ? cordsArray[i] : yMin;
                 }
             }
             for (int i = 0; i < cordsArray.Length; i++)
             {
                 if (i % 2 == 0)
                 {
-                    cordsArray[i] = 0 - xMin;
+                    cordsArray[i] -= xMin;
                 }
                 else
                 {
-                    cordsArray[i] = 0 - yMin;
+                    cordsArray[i] -= yMin;
                 }
             }
             return cordsArray;
