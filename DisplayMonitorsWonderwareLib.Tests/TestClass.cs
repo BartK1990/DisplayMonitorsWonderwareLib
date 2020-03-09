@@ -37,5 +37,19 @@ namespace DisplayMonitorsWonderwareLib.Tests
                 Assert.That(cord, Is.GreaterThanOrEqualTo(0), $"There is coordinate lesser than 0 : {cord}");
             }
         }
+        [Test]
+        public void TestCoordinatesTopLeftFirst()
+        {
+            int[] cords = dm.MonitorsCoordinatesTopLeftFirst();
+            Assert.That(cords.Length, Is.GreaterThan(0), "Are you testing without displays?");
+            if (cords.Length > 3)
+            {
+                for (int i = 1; i < cords.Length/2; i++)
+                {
+                    TestContext.WriteLine($"Testing cords pair number {i}.Current X: {cords[i*2]}, Y: {cords[i*2+1]} with previous X: {cords[(i-1)*2]}, Y: {cords[(i-1)*2+1]}");
+                    Assert.That(cords[i*2]+cords[i*2+1], Is.GreaterThanOrEqualTo(cords[(i-1)*2]+cords[(i-1)*2+1]), $"Coordinates are not sorted properly");
+                }
+            }
+        }
     }
 }

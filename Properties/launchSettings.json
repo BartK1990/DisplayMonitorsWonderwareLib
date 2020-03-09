@@ -1,8 +1,13 @@
 {
   "profiles": {
     "DisplayMonitorsWonderwareLib": {
+      "commandName": "Project"
+    },
+    "DisplayMonitors_debug": {
       "commandName": "Executable",
-      "executablePath": "C:\\Users\\kuriatab\\source\\repos\\CheckDisplayMonitors\\bin\\Debug\\CheckDisplayMonitors.exe"
+      "executablePath": "C:\\Users\\kuriatab\\source\\repos\\CheckDisplayMonitors\\bin\\Debug\\CheckDisplayMonitors.exe",
+      "sqlDebugging": false,
+      "nativeDebugging": false
     }
   }
 }

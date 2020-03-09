@@ -1,12 +1,13 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.Tracing;
 using System.Runtime.InteropServices;
-using Microsoft.Win32.SafeHandles;
 
 namespace DisplayMonitorsWonderwareLib
 {
     [StructLayout(LayoutKind.Sequential)]
-    struct Rect
+    struct Rect : IComparable
     {
         public int left;
         public int top;
@@ -16,6 +17,23 @@ namespace DisplayMonitorsWonderwareLib
         public override string ToString()
         {
             return $"{nameof(left)}: {left}, {nameof(top)}: {top}, {nameof(right)}: {right}, {nameof(bottom)}: {bottom}";
+        }
+
+        public int CompareTo(object obj)
+        {
+            Rect r = (Rect) obj;
+
+            if (this.CompareValue() < r.CompareValue())
+                return -1;
+            else if (this.CompareValue() == r.CompareValue())
+                return 0;
+            else
+                return 1;
+        }
+
+        private int CompareValue()
+        {
+            return left + top;
         }
     }
 
@@ -30,8 +48,12 @@ namespace DisplayMonitorsWonderwareLib
 
     public class DisplayMonitors
     {
-        private List<int> monitorXcordsList;
-        private List<int> monitorYcordsList;
+        enum ReadStatus
+        {
+            Success = 0,
+            Failure = 1
+        }
+        private List<Rect> monitorRectsList;
 
         delegate bool MonitorEnumDelegate(IntPtr hMonitor, IntPtr hdcMonitor, ref Rect lprcMonitor, IntPtr dwData);
 
@@ -46,28 +68,31 @@ namespace DisplayMonitorsWonderwareLib
             MonitorInfo mi = new MonitorInfo();
             mi.size = (uint) Marshal.SizeOf(mi);
             bool success = GetMonitorInfo(hMonitor, ref mi);
-
-            monitorXcordsList.Add(mi.monitor.left);
-            monitorYcordsList.Add(mi.monitor.top);
+            
+            monitorRectsList.Add(new Rect(){top = mi.monitor.top, left = mi.monitor.left, bottom = mi.monitor.bottom, right = mi.monitor.right});
             return true;
+        }
+
+        private ReadStatus ReadMonitors()
+        {
+            monitorRectsList = new List<Rect>();
+            MonitorEnumDelegate med = new MonitorEnumDelegate(MonitorEnum);
+            EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, med, IntPtr.Zero);
+
+            return monitorRectsList.Count > 0 ? ReadStatus.Success : ReadStatus.Failure;
         }
 
         public int[] MonitorsCoordinates()
         {
-            monitorXcordsList = new List<int>();
-            monitorYcordsList = new List<int>();
             int[] cordsArray = new int[0];
-            MonitorEnumDelegate med = new MonitorEnumDelegate(MonitorEnum);
-            EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, med, IntPtr.Zero);
-            if (monitorXcordsList.Count == monitorYcordsList.Count)
+            if (ReadMonitors() != ReadStatus.Success) return cordsArray;
+
+            int cordsArraySize = monitorRectsList.Count * 2;
+            cordsArray = new int[cordsArraySize];
+            for (int i = 0; i < monitorRectsList.Count; i++)
             {
-                int cordsArraySize = monitorXcordsList.Count * 2;
-                cordsArray = new int[cordsArraySize];
-                for (int i = 0; i < monitorXcordsList.Count; i++)
-                {
-                    cordsArray[i * 2] = monitorXcordsList[i];
-                    cordsArray[i * 2 + 1] = monitorYcordsList[i];
-                }
+                cordsArray[i * 2] = monitorRectsList[i].left;
+                cordsArray[i * 2 + 1] = monitorRectsList[i].top;
             }
             return cordsArray;
         }
@@ -99,6 +124,20 @@ namespace DisplayMonitorsWonderwareLib
                 {
                     cordsArray[i] -= yMin;
                 }
+            }
+            return cordsArray;
+        }
+
+        public int[] MonitorsCoordinatesTopLeftFirst()
+        { 
+            int[] cordsArray = MonitorsCoordinates();
+            if (ReadMonitors() != ReadStatus.Success) return cordsArray;
+
+            monitorRectsList.Sort();
+            for (int i = 0; i < monitorRectsList.Count; i++)
+            {
+                cordsArray[i * 2] = monitorRectsList[i].left;
+                cordsArray[i * 2 + 1] = monitorRectsList[i].top;
             }
             return cordsArray;
         }
